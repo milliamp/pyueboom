@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .const import MANUFACTURER_ID, PowerCommand, PowerState
+from .const import AUDIO_CONNECTED_FLAG, MANUFACTURER_ID, PowerCommand, PowerState
 
 
 def normalize_mac(mac: str) -> str:
@@ -40,7 +40,7 @@ class UEBoomAdvertisement:
               ^^    ^^    ^^^^^^^^^^^^ ^^^^^^^^^^^^
               |     |     |            speaker address
               |     |     last host while in standby, zeros while on
-              |     power state (0x00 standby, 0x40 on)
+              |     power state (see PowerState)
               battery percent
     """
 
@@ -54,6 +54,11 @@ class UEBoomAdvertisement:
     def is_on(self) -> bool:
         """Return True if the speaker reports it is on."""
         return self.power_state != PowerState.STANDBY
+
+    @property
+    def audio_connected(self) -> bool:
+        """Return True if the speaker has an audio (A2DP) connection."""
+        return bool(self.power_state & AUDIO_CONNECTED_FLAG)
 
     @classmethod
     def from_manufacturer_data(
@@ -87,6 +92,11 @@ class UEBoomState:
     def is_on(self) -> bool:
         """Return True if the speaker reports it is on."""
         return self.power_state != PowerState.STANDBY
+
+    @property
+    def audio_connected(self) -> bool:
+        """Return True if the speaker has an audio (A2DP) connection."""
+        return bool(self.power_state & AUDIO_CONNECTED_FLAG)
 
     @property
     def firmware_version(self) -> str | None:

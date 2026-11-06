@@ -48,3 +48,17 @@ def test_state() -> None:
     assert state.is_on
     assert state.firmware_version == "1.1.0.24"
     assert not UEBoomState(power_state=0).is_on
+
+
+@pytest.mark.parametrize(
+    ("state", "on", "connected"),
+    [(0x00, False, False), (0x20, True, False), (0x40, True, True), (0x60, True, True)],
+)
+def test_audio_connected_flag(state: int, on: bool, connected: bool) -> None:
+    data = bytearray(ADV_ON)
+    data[4] = state
+    adv = UEBoomAdvertisement.from_manufacturer_data({0x0003: bytes(data)})
+    assert adv is not None
+    assert adv.is_on is on
+    assert adv.audio_connected is connected
+    assert UEBoomState(power_state=state).audio_connected is connected

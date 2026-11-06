@@ -12,7 +12,7 @@ It's the protocol library behind the [UE BOOM Home Assistant integration](https:
 ## Install
 
 ```bash
-pip install https://github.com/milliamp/pyueboom/releases/download/v0.1.0/pyueboom-0.1.0-py3-none-any.whl
+pip install https://github.com/milliamp/pyueboom/releases/download/v0.2.0/pyueboom-0.2.0-py3-none-any.whl
 ```
 
 ## Usage
@@ -41,11 +41,25 @@ python -m pyueboom on C0:28:8D:00:11:22 --host-mac 00:1A:7D:00:33:44
 python -m pyueboom off C0:28:8D:00:11:22
 ```
 
+Reconnect the audio from the host it's paired with (BlueZ over D-Bus, Linux), e.g. when the speaker is on but
+dropped its A2DP link:
+
+```python
+from pyueboom import bluez
+
+if boom.is_on and not boom.audio_connected:
+    await bluez.connect_audio(boom.address, adapter="hci0")
+```
+
 Passive updates (e.g. from a `BleakScanner` or Home Assistant callback):
 
 ```python
 boom.set_ble_device_and_advertisement_data(ble_device, advertisement_data)
-boom.is_on, boom.battery_level  # decoded from manufacturer data, no connection needed
+(
+    boom.is_on,
+    boom.audio_connected,
+    boom.battery_level,
+)  # decoded from manufacturer data, no connection needed
 ```
 
 ## Protocol
@@ -53,7 +67,7 @@ boom.is_on, boom.battery_level  # decoded from manufacturer data, no connection 
 | What | How |
 |---|---|
 | Power | **Write Request** (not Write Command) to `c6d6dc0d-07f5-47ef-9b59-630622b01fd3`: 6-byte host MAC + `01` (on) / `02` (off). On power-on the speaker connects A2DP to that host, or to its last host if the MAC is all zeros. |
-| State | Read `4356a21c-a599-4b94-a1c8-4b91fca02a9a`: `0x00` standby, `0x20` starting up (a few seconds after power-on), `0x40` on. |
+| State | Read `4356a21c-a599-4b94-a1c8-4b91fca02a9a`: `0x00` standby, any other value on. Bit `0x40` is set while the speaker has an audio (A2DP) connection (`0x20` = on, not connected; `0x40`/`0x60` = connected). |
 | Battery | Standard Battery Level `0x2A19`. |
 | Advertisement | Manufacturer data, company `0x0003`: byte 2 battery %, byte 4 power state, bytes 6–11 last host (standby) or zeros (on), bytes 12–17 speaker address. |
 

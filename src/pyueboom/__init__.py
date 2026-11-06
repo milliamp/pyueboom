@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .const import MANUFACTURER_ID, PowerCommand, PowerState
+from .const import AUDIO_CONNECTED_FLAG, MANUFACTURER_ID, PowerCommand, PowerState
 from .device import UEBoom
 from .exceptions import (
     AttError,
@@ -12,9 +12,10 @@ from .exceptions import (
 )
 from .models import UEBoomAdvertisement, UEBoomState
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
+    "AUDIO_CONNECTED_FLAG",
     "MANUFACTURER_ID",
     "AttError",
     "CharacteristicMissingError",

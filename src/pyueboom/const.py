@@ -37,9 +37,18 @@ class PowerCommand(IntEnum):
 
 
 class PowerState(IntEnum):
-    """Values seen in the state characteristic and advertisement byte 4."""
+    """Values seen in the state characteristic and advertisement byte 4.
+
+    Any non-zero value means the speaker is on. The byte is a bit field: see
+    :data:`AUDIO_CONNECTED_FLAG`. Seen on a BOOM 3: ``0x20`` on without an
+    audio connection, ``0x40`` / ``0x60`` on with one.
+    """
 
     STANDBY = 0x00
-    #: Seen for a few seconds right after a power-on command.
-    STARTING = 0x20
+    #: On, but no audio (A2DP) connection to any host.
+    ON_NOT_CONNECTED = 0x20
     ON = 0x40
+
+
+#: Set in the power state while the speaker has an audio (A2DP) connection.
+AUDIO_CONNECTED_FLAG = 0x40

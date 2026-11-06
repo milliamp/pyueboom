@@ -93,6 +93,15 @@ class UEBoom:
         return None
 
     @property
+    def audio_connected(self) -> bool | None:
+        """Whether the speaker has an audio (A2DP) connection to some host."""
+        if self._advertisement is not None:
+            return self._advertisement.audio_connected
+        if self._state is not None:
+            return self._state.audio_connected
+        return None
+
+    @property
     def battery_level(self) -> int | None:
         """Battery percent from the newest source."""
         if self._advertisement is not None:
@@ -136,7 +145,9 @@ class UEBoom:
                 except UEBoomConnectionError as ex:
                     last = ex
                     _LOGGER.debug("%s: attempt %s failed: %s", self._address, attempt, ex)
-                    await asyncio.sleep(0.5 * attempt)
+                    # EBUSY (another LE connection attempt pending on the adapter) and
+                    # first-connect drops clear up within a second or two.
+                    await asyncio.sleep(1.0 * attempt)
         assert last is not None
         raise last
 
