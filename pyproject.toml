@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyueboom"
+dynamic = ["version"]
+description = "Control Ultimate Ears BOOM / MEGABOOM speakers (power, battery, state) over Bluetooth LE"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "milliamp" }]
+requires-python = ">=3.12"
+dependencies = [
+  "bleak>=1.0.1",
+  "bleak-retry-connector>=3.5.0",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Framework :: AsyncIO",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Home Automation",
+]
+
+[project.urls]
+Homepage = "https://github.com/milliamp/pyueboom"
+Issues = "https://github.com/milliamp/pyueboom/issues"
+
+[project.scripts]
+pyueboom = "pyueboom.__main__:main"
+
+[project.optional-dependencies]
+test = ["pytest>=8", "pytest-asyncio>=0.24"]
+
+[tool.hatch.version]
+path = "src/pyueboom/__init__.py"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
